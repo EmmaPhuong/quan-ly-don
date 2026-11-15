@@ -7,5 +7,7 @@
     for(var i=0;i<urls.length&&!window.supabase;i++){try{await load(urls[i])}catch(e){}}
     if(!window.supabase){document.getElementById('main').innerHTML='<div class="empty">Không tải được thư viện kết nối. Kiểm tra mạng rồi tải lại trang.</div>';return}
     await load('app.js');
+    await load('app2.js');
+    boot();
   })();
 })();
