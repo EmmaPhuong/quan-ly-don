@@ -128,3 +128,21 @@ tr.detail .tw{background:var(--surface)}
 .nav .badge{display:inline-block;background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;margin-left:4px}
 .credit{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--good-soft);border:1px solid var(--good);border-radius:8px;padding:10px 12px;margin-top:10px}
 .busy{opacity:.6;pointer-events:none}
+
+/* liên kết giữa các màn hình, tìm kiếm chung */
+.lnk{color:var(--accent-ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;cursor:pointer}
+.lnk:hover{text-decoration-color:var(--accent-ink)}
+.nav .gs{flex:0 1 220px;min-width:120px;margin-left:8px}
+.gsr{position:fixed;top:56px;right:12px;width:min(420px,calc(100vw - 24px));max-height:60vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;z-index:50}
+.gsr button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 10px;border-radius:7px;color:var(--ink);font:inherit;cursor:pointer}
+.gsr button:hover{background:var(--accent-soft)}
+.gsr .empty{padding:12px}
+.x{background:none;border:0;color:var(--ink2);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px}
+.x:hover{color:var(--bad)}
+tr.sel td{background:var(--accent-soft)}
+.bad{color:var(--bad)}.good{color:var(--good)}
+.lbl{display:block;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.nav{flex-wrap:wrap;overflow:visible;align-items:center;row-gap:0}
+.nav button.primary,.nav button.ghost{border-bottom-width:1px;padding:7px 12px;margin:4px 0;color:inherit}
+.nav button.primary{color:#fff}
+.nav .sp{flex:1 1 8px}
