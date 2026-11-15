@@ -326,9 +326,9 @@ function editor(){
     <section class="card"><h2>Lợi nhuận đơn <span class="private">Chỉ mình bạn thấy</span></h2><div id="profitHead"></div><div class="tot" id="profitRows" style="margin-top:10px"></div></section>
     <section class="card"><h2>Tiền hàng và thu tiền</h2><div class="tot" id="moneyRows"></div></section>
     <section class="card"><h2>Ghi nhận thu tiền</h2><div id="creditBox"></div><div id="pays"></div>
-      <div class="row" style="margin-top:8px"><select id="payKind" style="width:auto"><option value="adv">Tạm ứng cắt hàng</option><option value="pay">Thanh toán thêm</option></select><input id="payAmt" type="number" step="10000" placeholder="Số tiền thực thu" style="width:140px"><button type="button" class="primary" data-act="payadd">Ghi nhận</button></div>
-      <div class="row" style="margin-top:6px"><button type="button" class="ghost sm" data-act="payquick" id="payQuick">Thu đủ tạm ứng</button></div>
-      <p class="hint" style="margin:6px 0 0">Khách cọc ít hơn dự kiến cũng được: tạm ứng lấy theo số thực thu, QR và còn phải thu tính lại.</p></section>
+      <div class="row" style="margin-top:8px"><select id="payKind" style="width:auto"><option value="adv">Tạm ứng cắt hàng</option><option value="pay">Thanh toán còn lại</option></select><select id="payMethod" style="width:auto"><option value="Tiền mặt">Tiền mặt</option><option value="Chuyển khoản">Chuyển khoản (ghi tay)</option></select><input id="payAmt" type="number" step="10000" placeholder="Số tiền thực thu" style="width:140px"><input id="payDate" type="date" style="width:auto" aria-label="Ngày thu"><button type="button" class="primary" data-act="payadd">Ghi nhận</button></div>
+      <div class="row" style="margin-top:6px"><button type="button" class="ghost sm" data-act="payquick" id="payQuick">Thu đủ tạm ứng</button><button type="button" class="ghost sm" data-act="payrest" id="payRest">Thu đủ còn phải thu</button></div>
+      <p class="hint" style="margin:6px 0 0">Khoản ghi tay (tiền mặt hoặc chuyển khoản không tự nhận) chỉ được lưu khi bạn bấm <b>Lưu</b>. Khách cọc ít hơn dự kiến cũng được: tạm ứng lấy theo số thực thu, QR và còn phải thu tính lại.</p></section>
   </aside></div>`;
 
   const bindE=(id,key,num,cb)=>{const el=$('#'+id);el.value=ED[key]==null?'':ED[key];el.addEventListener('input',()=>{ED[key]=num?nz(el.value):el.value;(cb||calc)();});};
@@ -354,6 +354,7 @@ function editor(){
   $('#dai').value=D.dai||6;$('#n').value=D.n||4;$('#qty').value=D.qty||10;
   popDraft();readDraft();setKind(D.k);
   $('#payKind').value=oCalc(ED).advPaid>0?'pay':'adv';
+  $('#payDate').value=TODAY;
   renderLines();
 }
 function popDraft(){
@@ -392,8 +393,8 @@ function autoComplete(){
   if(ED.status==='Đã giao'&&c.total>0&&c.remain<=0)ED.status='Hoàn thành';
   else if(ED.status==='Hoàn thành'&&c.remain>0)ED.status='Đã giao';
 }
-function recordPay(a,kind){
-  ED.pays.push({d:TODAY,amt:a,kind,note:kind==='adv'?'Tạm ứng cắt hàng':'Thanh toán'});
+function recordPay(a,kind,method,date){
+  ED.pays.push({d:date||TODAY,amt:a,kind,note:(method?method+' · ':'')+(kind==='adv'?'Tạm ứng cắt hàng':'Thanh toán')});
   if(kind==='adv'){ED.advance=ED.pays.filter(p=>p.kind==='adv').reduce((s,p)=>s+p.amt,0);ED.advManual=true;$('#e-advance').value=ED.advance;}
   const was=ED.status;
   if(ED.status==='Nháp')ED.status='Đã chốt';
@@ -806,7 +807,8 @@ const ACT={
   linereset:b=>{const l=ED.lines[+b.dataset.i];if(l.pin==null){toast('NCC này chưa có giá nhập');return}l.pout=l.pin+nz(DB.settings.markup);l.manual=false;renderLines()},
   linepick:b=>{const l=ED.lines[+b.dataset.i];l.pout=+b.dataset.p;l.manual=true;renderLines();toast('Đã dùng giá '+money(+b.dataset.p))},
   advauto:()=>{ED.advManual=false;calc()},
-  payadd:()=>{const a=nz($('#payAmt').value);if(a<=0){toast('Nhập số tiền thực thu');return}recordPay(a,$('#payKind').value);$('#payAmt').value=''},
+  payadd:()=>{const a=nz($('#payAmt').value);if(a<=0){toast('Nhập số tiền thực thu');return}recordPay(a,$('#payKind').value,$('#payMethod').value,$('#payDate').value||TODAY);$('#payAmt').value=''},
+  payrest:()=>{const r=Math.round(oCalc(ED).bal);if(r<=0){toast('Đơn không còn khoản phải thu');return}recordPay(r,oCalc(ED).advPaid>0?'pay':'adv',$('#payMethod').value,$('#payDate').value||TODAY)},
   payquick:()=>{if(nz(ED.advance)>0)recordPay(nz(ED.advance),'adv')},
   paydel:b=>{
     ED.pays.splice(+b.dataset.i,1);
